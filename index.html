@@ -8,6 +8,13 @@
     
 </head>
 <body>
+    <div class="options">
+        <div class="scale">
+            Scale: 
+            <input id="scaleinp" class="scaleinp" type="number" min="1" max="8" value="1" oninput="setscale()">
+        </div>
+        
+    </div>
     <div class="calendar">
         <div class="datebar">
             <div class="datediv">Wed. 29.01</div>
@@ -22,7 +29,7 @@
             <div class="day">
                 <div class="event" id="1-1" >
                     <div class="eventrow">
-                        <span class="timespan" >10:30</span>
+                        <span class="timespan" >0:00</span>
                     </div>
                     <span class="namespan" onmousedown="startdrag(this.parentNode.id)">Testing</span>
                     <div class="eventrow">
