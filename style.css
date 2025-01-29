@@ -1,0 +1,92 @@
+html, body { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+
+.calendar {
+    width: 90%;
+    height: 80%;
+
+    position: relative;
+    
+    top: 50%;
+    left: 50%;
+    
+    transform: translate(-50%, -50%);
+
+    background-color: transparent;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    border: none;
+}
+
+.days {
+    width: 100%;
+    height: 90%;
+    
+    display: flex;
+    flex-direction: row;
+
+    border: 1px solid black;
+    border-right: none;
+    box-sizing: border-box;
+}
+
+.day {
+    height: 100%;
+    flex-grow: 1;
+    background-color: white;
+
+    box-sizing: border-box;
+    border-right: 1px solid black;
+}
+
+.addbar, .datebar {
+    height: 5%;
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    
+    background-color: transparent; 
+}
+
+.datediv {
+    height: 100%;
+    width: calc(100% / 7);
+
+    background-color: white;
+
+    box-sizing: border-box;
+
+    border-radius: 10px 10px 0 0;
+
+    border: 1px solid black;
+    border-bottom: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.addbtn {
+    height: 100%;
+    width: calc(100% / 7);
+
+    background-color: white;
+    
+    box-sizing: border-box;
+
+    border-radius: 0 0 10px 10px;
+
+    border: 1px solid black;
+    border-top: none;
+}
+
+.addbtn:hover {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}
