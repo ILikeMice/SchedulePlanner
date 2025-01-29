@@ -5,22 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SchedulePlanner</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    
 </head>
 <body>
     <div class="calendar">
         <div class="datebar">
             <div class="datediv">Wed. 29.01</div>
-            <div class="datediv"></div>
-            <div class="datediv"></div>
-            <div class="datediv"></div>
-            <div class="datediv"></div>
-            <div class="datediv"></div>
-            <div class="datediv"></div>
+            <div class="datediv">Thu. 30.01</div>
+            <div class="datediv">Fri. 31.01</div>
+            <div class="datediv">Sat. 01.02</div>
+            <div class="datediv">Sun. 02.02</div>
+            <div class="datediv">Mon. 03.02</div>
+            <div class="datediv">Tue. 04.02</div>
         </div>
         <div class="days">
-            <div class="day"></div>
-            <div class="day"></div>
+            <div class="day">
+                <div class="event" id="1-1">
+                    <div class="eventrow">
+                        <span class="timespan">10:30</span>
+                        <span class="resizespan leftresize">══</span>
+                    </div>
+                    <span class="namespan">Testing</span>
+                    <div class="eventrow">
+                        <span class="resizespan rightresize" onmousedown="startresize(this.parentNode.parentNode.id)">══</span>
+                        <span class="timespan righttime">11:00</span>
+                    </div>
+                    
+                </div>
+                <div class="event" id="1-2">
+                    <div class="eventrow">
+                        <span class="timespan">10:30</span>
+                        <span class="resizespan leftresize">══</span>
+                    </div>
+                    <span class="namespan">Testing</span>
+                    <div class="eventrow">
+                        <span class="resizespan rightresize" onmousedown="startresize(this.parentNode.parentNode.id)">══</span>
+                        <span class="timespan righttime">11:00</span>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="day">
+                <div class="event" id="2-1 ">
+                    <div class="eventrow">
+                        <span class="timespan">10:30</span>
+                        <span class="resizespan leftresize">══</span>
+                    </div>
+                    <span class="namespan">Testing</span>
+                    <div class="eventrow">
+                        <span class="resizespan rightresize" onmousedown="startresize(this)">══</span>
+                        <span class="timespan righttime">11:00</span>
+                    </div>
+                </div>
+            </div>
             <div class="day"></div>
             <div class="day"></div>
             <div class="day"></div>
@@ -38,4 +75,5 @@
         </div>
     </div>
 </body>
+<script src="script.js"></script>
 </html>
