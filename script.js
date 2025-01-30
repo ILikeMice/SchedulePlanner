@@ -261,10 +261,13 @@ function addevent(id) {
     let startspan = document.createElement("span")
     startspan.className = "timespan"
     
-    let startmins = data[id][Object.keys(data[id]).length]["end"]
+    let startmins = data[id][Object.keys(data[id]).length]["start"] + (data[id][Object.keys(data[id]).length]["end"] - data[id][Object.keys(data[id]).length]["start"])/2
     let endmins = 1440
     
-    data[id]
-
-    daydiv.appendChild(eventdiv)
+    data[id][Object.keys(data[id]).length]["end"] = startmins
+    data[id][Object.keys(data[id]).length + 1] = {
+        "start": startmins,
+        "end": endmins
+    }
+    
 }
