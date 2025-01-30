@@ -1,22 +1,99 @@
 let resizing = false
-let data = {
-    "1": {
-        "1": {
-            "name": "Testing",
-            "start": 0,
-            "end": 60
-        },
-        "2": {
-            "name": "Testing",
-            "start": 60,
-            "end": 120
+
+try {
+    data = JSON.parse(window.localStorage.getItem("data"))
+    if (data == null) {
+        data = {}
+        writedata()
+    }
+} catch {
+    data = {}
+    writedata()
+}
+
+window.onload = () => {
+    loadevents()
+    setscale()
+}
+
+function writedata() {
+    window.localStorage.setItem("data", JSON.stringify(data))
+}
+
+function dothething() {
+    for (let i = 1; i < 8; i++) {
+        data[String(i)] = {}
+        for (let b = 1; b < document.getElementById(String(i)).children.length + 1; b++) {
+            let child  = document.getElementById(String(i)).children[b-1]
+            console.log(child)
+            data[String(i)][String(b)] = {
+                "start": Math.round((1440/60) / (child.offsetHeight / (child.getBoundingClientRect().top - child.parentNode.getBoundingClientRect().top))),
+                "end": Math.round((1440/60) / (child.offsetHeight / (child.getBoundingClientRect().bottom - child.parentNode.getBoundingClientRect().top)))
+            }
         }
-    },
-    "2": {
-        "1": {
-            "name": "Testing",
-            "start": 0,
-            "end": 60
+    }
+    writedata()
+}
+
+function loadevents() {
+    let scale = document.getElementById("scaleinp").value
+    for (let i = 1; i < 8; i++) {
+        let day = document.getElementById(String(i))
+        day.innerHTML = ""
+        for (let b = 1; b < Object.keys(data[String(i)]).length + 1; b++) {
+            console.log("thing: ", i, b)
+            let eventdiv = document.createElement("div")
+            eventdiv.id = `${i}-${b}`
+            eventdiv.className = "event"
+            eventdiv.style.height = ((data[String(i)][String(b)]["end"] - data[String(i)][String(b)]["start"])*(day.offsetHeight / (1440/scale))) + "px"
+
+            let startdiv = document.createElement("div")
+            startdiv.className = "eventrow"
+
+            let startspan = document.createElement("span")
+            startspan.className = "timespan"
+            
+            let rawminutes = data[String(i)][String(b)]["start"] // wohoo ctl+c ctl+v
+            console.log("start ", rawminutes)
+            let hours = Math.floor(rawminutes / 60)
+            let minutes = rawminutes % 60
+            startspan.innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
+
+            let enddiv = document.createElement("div")
+            enddiv.className = "eventrow"
+
+            let endresize = document.createElement("span")
+            endresize.className = "resizespan rightresize"
+            endresize.onmousedown = () => {
+                startresize(`${i}-${b}`)
+
+            }
+            endresize.innerText = "══"
+
+            let endspan = document.createElement("span")
+            endspan.className = "timespan righttime"
+
+            let endminutes = data[String(i)][String(b)]["end"] 
+            console.log("end ", endminutes)
+            hours = Math.floor(endminutes / 60)
+            minutes = endminutes % 60
+            endspan.innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
+
+            let namespan = document.createElement("span")
+            namespan.className = "namespan"
+            namespan.innerText = "Event"
+
+            startdiv.appendChild(startspan)
+        
+            enddiv.appendChild(endresize)
+            enddiv.appendChild(endspan)
+
+            eventdiv.appendChild(startdiv)
+            eventdiv.appendChild(namespan)
+            eventdiv.appendChild(enddiv)
+
+            day.appendChild(eventdiv)
+            console.log("done")
         }
     }
 }
@@ -26,21 +103,77 @@ function startresize(id) {
 
     const movelisten = (e) => {
         console.log(element.getBoundingClientRect().bottom - element.parentNode.getBoundingClientRect().top)
+    
+        let scale = document.getElementById("scaleinp").value
 
-        let scale = 1
+        if (e.clientY - element.getBoundingClientRect().top < 0) {
+            return
+        }
+
+        if ((e.clientY - element.getBoundingClientRect().top + 5).toFixed(0) < (13.6 + 30)) {
+            console.log("too small")    
+            element.getElementsByClassName("namespan")[0].style.display = "none"
+            if ((e.clientY - element.getBoundingClientRect().top + 5).toFixed(0) < (13.6*2)) {
+                element.getElementsByClassName("timespan")[0].style.display = "none"
+                if ((e.clientY - element.getBoundingClientRect().top + 5).toFixed(0) < (13.6)) {
+                    element.getElementsByClassName("righttime")[0].style.display = "none"
+                }
+            }
+        } else {
+            element.getElementsByClassName("timespan")[0].style.display = "flex"
+            element.getElementsByClassName("namespan")[0].style.display = "flex"
+            element.getElementsByClassName("righttime")[0].style.display = "block"
+        }
         
         element.style.height = (e.clientY - element.getBoundingClientRect().top + 5).toFixed(0) + "px" 
-        let rawminutes = Math.round((1140/scale) / ( element.parentNode.offsetHeight / (element.getBoundingClientRect().bottom - element.parentNode.getBoundingClientRect().top)))
+        let rawminutes = Math.round((1440/scale) / ( element.parentNode.offsetHeight / (element.getBoundingClientRect().bottom - element.parentNode.getBoundingClientRect().top)))
+        if (rawminutes > 1441) {
+            rawminutes = 1440;
+            document.removeEventListener("mousemove", movelisten);
+            return;
+        }
+        
         let hours = Math.floor(rawminutes / 60)
         let minutes = rawminutes % 60
         element.getElementsByClassName("righttime")[0].innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
         data[id.split("-")[0]][id.split("-")[1]]["end"] = rawminutes
         
-        try {
-            document.getElementById(String(id.split("-")[0] + "-" + (Number(id.split("-")[1]) + 1))).getElementsByClassName("timespan")[0].innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
-        } catch {}
+        let currentId = id;
+        while (true) { // thanks to copilot for helping me out with this, got really confused at some point
+            let nextId = String(currentId.split("-")[0] + "-" + (Number(currentId.split("-")[1]) + 1));
+            let nextElement = document.getElementById(nextId);
+            if (!nextElement) break;
+
+            try {
+                nextElement.getElementsByClassName("timespan")[0].innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`;
+                let timediff = data[currentId.split("-")[0]][String(Number(currentId.split("-")[1]) + 1)]["end"] - data[currentId.split("-")[0]][String(Number(currentId.split("-")[1]) + 1)]["start"];
+                data[currentId.split("-")[0]][String(Number(currentId.split("-")[1]) + 1)]["start"] = rawminutes;
+                data[currentId.split("-")[0]][String(Number(currentId.split("-")[1]) + 1)]["end"] = rawminutes + timediff;
+                let newrawminutes = rawminutes + timediff;
+
+                if (newrawminutes > 1441) {
+                    newrawminutes = 1440
+                    document.removeEventListener("mousemove", movelisten)
+                    break
+                }
+
+                let newhours = Math.floor(newrawminutes / 60);
+                let newminutes = newrawminutes % 60;
+                nextElement.getElementsByClassName("righttime")[0].innerText = `${newhours}:${newminutes < 10 ? "0" + newminutes : newminutes}`;
+
+                rawminutes = newrawminutes;
+                hours = newhours;
+                minutes = newminutes;
+                currentId = nextId;
+            } catch (err) {
+                console.error(err);
+                break;
+            }
+        }
         
-        rawminutes = Math.round((1140/scale) / ( element.parentNode.offsetHeight / (element.getBoundingClientRect().top - element.parentNode.getBoundingClientRect().top)))
+        writedata()
+        
+        rawminutes = Math.round((1440/scale) / ( element.parentNode.offsetHeight / (element.getBoundingClientRect().top - element.parentNode.getBoundingClientRect().top)))
         
         hours = Math.floor(rawminutes / 60)
         minutes = rawminutes % 60
@@ -53,6 +186,7 @@ function startresize(id) {
     })
 }
 
+/* experimental for now
 function startdrag(id) {
     let element = document.getElementById(id)
 
@@ -72,7 +206,7 @@ function startdrag(id) {
         element.style.cursor = "grab"
         document.removeEventListener("mousemove", movelisten)
     })
-}
+}*/
 
 function setscale() {
     let scale = document.getElementById("scaleinp").value
@@ -85,12 +219,29 @@ function setscale() {
 
             console.log(node.getElementsByClassName("timespan")[0].height * 2)
 
-            node.style.minHeight = "unset"
-            node.style.height = ((data[i + 1][b + 1]["end"] - data[i + 1][b + 1]["start"])*(day.offsetHeight / (1140/scale))) + "px"
-            node.style.overflow = "hidden"
+            
 
-            node.getElementsByClassName("timespan")[0].innerText = data[i+1][b+1]["start"]
-            node.getElementsByClassName("righttime")[0].innerText = data[i+1][b+1]["end"]
+            node.style.minHeight = "unset"
+            node.style.height = ((data[i + 1][b + 1]["end"] - data[i + 1][b + 1]["start"])*(day.offsetHeight / (1440/scale))) + "px"
+            node.style.overflow = "hidden"
+            
+            if (node.offsetHeight < (13.6 + 30)) {
+                console.log("too small")    
+                node.getElementsByClassName("namespan")[0].style.display = "none"
+                if (node.offsetHeight < (13.6*2)) {
+                    node.getElementsByClassName("timespan")[0].style.display = "none"
+                    if (node.offsetHeight < 13.6) {
+                        node.getElementsByClassName("righttime")[0].style.display = "none"
+                    }
+                }
+            } else {
+                node.getElementsByClassName("timespan")[0].style.display = "flex"
+                node.getElementsByClassName("namespan")[0].style.display = "flex"
+                node.getElementsByClassName("righttime")[0].style.display = "block"
+            }
+
+            node.getElementsByClassName("timespan")[0].innerText = `${Math.floor(data[i+1][b+1]["start"]/60)}:${data[i+1][b+1]["start"] % 60 < 10 ? "0" + data[i+1][b+1]["start"] % 60 : data[i+1][b+1]["start"] % 60}`
+            node.getElementsByClassName("righttime")[0].innerText = `${Math.floor(data[i+1][b+1]["end"]/60)}:${data[i+1][b+1]["end"] % 60 < 10 ? "0" + data[i+1][b+1]["end"] % 60 : data[i+1][b+1]["end"] % 60}`
         }
     }
 }
@@ -103,7 +254,17 @@ function addevent(id) {
     for (let i = 0; i < daydiv.children.length; i++) {
         maxheight += daydiv.children[i].offsetHeight
     }
-    eventdiv.style.height = daydiv.offsetHeight - maxheight
+    console.log(maxheight)
     eventdiv.className = "event"
+    eventdiv.style.height = daydiv.offsetHeight - maxheight + "px"
+
+    let startspan = document.createElement("span")
+    startspan.className = "timespan"
     
+    let startmins = data[id][Object.keys(data[id]).length]["end"]
+    let endmins = 1440
+    
+    data[id]
+
+    daydiv.appendChild(eventdiv)
 }
