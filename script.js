@@ -28,7 +28,8 @@ function dothething() {
             console.log(child)
             data[String(i)][String(b)] = {
                 "start": Math.round((1440/60) / (child.offsetHeight / (child.getBoundingClientRect().top - child.parentNode.getBoundingClientRect().top))),
-                "end": Math.round((1440/60) / (child.offsetHeight / (child.getBoundingClientRect().bottom - child.parentNode.getBoundingClientRect().top)))
+                "end": Math.round((1440/60) / (child.offsetHeight / (child.getBoundingClientRect().bottom - child.parentNode.getBoundingClientRect().top))),
+                "name": child.getElementsByClassName("namespan")[0].innerText
             }
         }
     }
@@ -46,6 +47,8 @@ function loadevents() {
             eventdiv.id = `${i}-${b}`
             eventdiv.className = "event"
             eventdiv.style.height = ((data[String(i)][String(b)]["end"] - data[String(i)][String(b)]["start"])*(day.offsetHeight / (1440/scale))) + "px"
+
+            eventdiv.style.backgroundColor = data[String(i)][String(b)]["color"]
 
             let startdiv = document.createElement("div")
             startdiv.className = "eventrow"
@@ -81,7 +84,7 @@ function loadevents() {
 
             let namespan = document.createElement("span")
             namespan.className = "namespan"
-            namespan.innerText = "Event"
+            namespan.innerText = data[String(i)][String(b)]["name"]
 
             startdiv.appendChild(startspan)
         
@@ -134,7 +137,7 @@ function startresize(id) {
         }
         
         let hours = Math.floor(rawminutes / 60)
-        let minutes = rawminutes % 60
+        let minutes = (rawminutes % 60).toFixed(0)
         element.getElementsByClassName("righttime")[0].innerText = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
         data[id.split("-")[0]][id.split("-")[1]]["end"] = rawminutes
         
@@ -158,7 +161,7 @@ function startresize(id) {
                 }
 
                 let newhours = Math.floor(newrawminutes / 60);
-                let newminutes = newrawminutes % 60;
+                let newminutes = (newrawminutes % 60).toFixed(0);
                 nextElement.getElementsByClassName("righttime")[0].innerText = `${newhours}:${newminutes < 10 ? "0" + newminutes : newminutes}`;
 
                 rawminutes = newrawminutes;
@@ -240,13 +243,13 @@ function setscale() {
                 node.getElementsByClassName("righttime")[0].style.display = "block"
             }
 
-            node.getElementsByClassName("timespan")[0].innerText = `${Math.floor(data[i+1][b+1]["start"]/60)}:${data[i+1][b+1]["start"] % 60 < 10 ? "0" + data[i+1][b+1]["start"] % 60 : data[i+1][b+1]["start"] % 60}`
-            node.getElementsByClassName("righttime")[0].innerText = `${Math.floor(data[i+1][b+1]["end"]/60)}:${data[i+1][b+1]["end"] % 60 < 10 ? "0" + data[i+1][b+1]["end"] % 60 : data[i+1][b+1]["end"] % 60}`
+            node.getElementsByClassName("timespan")[0].innerText = `${Math.floor(data[i+1][b+1]["start"]/60)}:${data[i+1][b+1]["start"] % 60 < 10 ? "0" + (data[i+1][b+1]["start"] % 60).toFixed(0) : (data[i+1][b+1]["start"] % 60).toFixed(0)}`
+            node.getElementsByClassName("righttime")[0].innerText = `${Math.floor(data[i+1][b+1]["end"]/60)}:${data[i+1][b+1]["end"] % 60 < 10 ? "0" + (data[i+1][b+1]["end"] % 60).toFixed(0) : (data[i+1][b+1]["end"] % 60).toFixed(0)}`
         }
     }
 }
 
-function addevent(id) {
+function addevent(id, name, color) {
     let daydiv = document.getElementById(id)
     let eventdiv = document.createElement("div")
     
@@ -261,13 +264,39 @@ function addevent(id) {
     let startspan = document.createElement("span")
     startspan.className = "timespan"
     
-    let startmins = data[id][Object.keys(data[id]).length]["start"] + (data[id][Object.keys(data[id]).length]["end"] - data[id][Object.keys(data[id]).length]["start"])/2
-    let endmins = 1440
+    let startmins;
+    try {startmins = data[id][Object.keys(data[id]).length]["start"] + (data[id][Object.keys(data[id]).length]["end"] - data[id][Object.keys(data[id]).length]["start"])/2 } catch { startmins = 0}
+
     
-    data[id][Object.keys(data[id]).length]["end"] = startmins
+    let endmins = 1440
+    try {
+        data[id][Object.keys(data[id]).length]["end"] = startmins
+    } catch {}
+    
     data[id][Object.keys(data[id]).length + 1] = {
         "start": startmins,
-        "end": endmins
+        "end": endmins,
+        "name": name,
+        "color": color
     }
-    
+    writedata()
+
+    loadevents()
+    setscale()
+    window.location.reload()
+}
+
+function hidepopup() {
+    document.getElementById("popup").style.display = "none"
+}
+
+function showpopup(id) {
+    let popup = document.getElementById("popup")
+
+    popup.style.display = "block"
+
+    popup.getElementsByClassName("popupcontent")[0].getElementsByClassName("addeventbtn")[0].onclick = () => {
+        addevent(id, document.getElementById("nameinput").value, document.getElementById("colorinput").value)
+        hidepopup()
+    }
 }

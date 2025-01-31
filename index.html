@@ -81,20 +81,25 @@
                 <div class="day" id="7"></div>
             </div>
             <div class="addbar">
-                <button class="addbtn" onclick="addevent(1)">Add Event...</button>
-                <button class="addbtn" onclick="addevent(2)">Add Event...</button>
-                <button class="addbtn" onclick="addevent(3)">Add Event...</button>
-                <button class="addbtn" onclick=addevent(4)>Add Event...</button>
-                <button class="addbtn" onclick="addevent(5)">Add Event...</button>
-                <button class="addbtn" onclick="addevent(6)">Add Event...</button>
-                <button class="addbtn" onclick="addevent(7)">Add Event...</button>
+                <button class="addbtn" onclick="showpopup(1)">Add Event...</button>
+                <button class="addbtn" onclick="showpopup(2)">Add Event...</button>
+                <button class="addbtn" onclick="showpopup(3)">Add Event...</button>
+                <button class="addbtn" onclick=showpopup(4)>Add Event...</button>
+                <button class="addbtn" onclick="showpopup(5)">Add Event...</button>
+                <button class="addbtn" onclick="showpopup(6)">Add Event...</button>
+                <button class="addbtn" onclick="showpopup(7)">Add Event...</button>
             </div>
         </div>
     </div>
-    <div class="eventpopup">
-        <span class="popuptitle">Create Event</span>
+    <div class="eventpopup" id="popup">
+        <span class="popuptitle">Event</span>
         <div class="popupcontent">
-            
+            <input id="nameinput" class="nameinput" type="text" placeholder="Event Name...">
+            <div class="eventcolor">
+                <span>Color: </span>
+                <input id="colorinput" class="colorinp" type="color" value="#f3b862">
+            </div>
+            <button class="addeventbtn">Add Event</button>
         </div>
     </div>
 </body>
