@@ -3,11 +3,11 @@ let resizing = false
 try {
     data = JSON.parse(window.localStorage.getItem("data"))
     if (data == null) {
-        data = {}
+        data = {"1": {}, "2": {}, "3": {}, "4": {}, "5": {}, "6": {}, "7": {}}
         writedata()
     }
 } catch {
-    data = {}
+    data = {"1": {}, "2": {}, "3": {}, "4": {}, "5": {}, "6": {}, "7": {}}
     writedata()
 }
 
@@ -49,6 +49,11 @@ function loadevents() {
             eventdiv.style.height = ((data[String(i)][String(b)]["end"] - data[String(i)][String(b)]["start"])*(day.offsetHeight / (1440/scale))) + "px"
 
             eventdiv.style.backgroundColor = data[String(i)][String(b)]["color"]
+
+            eventdiv.addEventListener("contextmenu", (e) => {
+                e.preventDefault()
+                deleteevent(eventdiv.id)
+            })
 
             let startdiv = document.createElement("div")
             startdiv.className = "eventrow"
@@ -222,8 +227,6 @@ function setscale() {
 
             console.log(node.getElementsByClassName("timespan")[0].height * 2)
 
-            
-
             node.style.minHeight = "unset"
             node.style.height = ((data[i + 1][b + 1]["end"] - data[i + 1][b + 1]["start"])*(day.offsetHeight / (1440/scale))) + "px"
             node.style.overflow = "hidden"
@@ -300,3 +303,4 @@ function showpopup(id) {
         hidepopup()
     }
 }
+
