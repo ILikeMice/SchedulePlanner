@@ -10,6 +10,14 @@ A simple webuntis-themed Planner I made to help me plan my days! Please note tha
 - Scale the day for more precise resizing!
 - More coming soon!
 
+### Update 1
+
+First update after release!
+
+- Added line that follows current time
+- Added ability to specify end time when creating event
+- Polished the project overall!
+
 ## Future Features
 
 Some things im planning on adding are:

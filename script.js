@@ -14,6 +14,12 @@ try {
 window.onload = () => {
     loadevents()
     setscale()
+
+    let currtimediv = document.createElement("div")
+    currtimediv.className = "currenttimediv"
+    currtimediv.style.marginTop = document.getElementById("days").offsetHeight * ((new Date().getMinutes() + new Date().getHours()*60)/1440) + "px"
+
+    document.getElementById(String(new Date().getDay())).appendChild(currtimediv)
 }
 
 function writedata() {
@@ -252,29 +258,32 @@ function setscale() {
     }
 }
 
-function addevent(id, name, color) {
+function addevent(id, name, color, endtime) {
     let daydiv = document.getElementById(id)
     let eventdiv = document.createElement("div")
-    
-    let maxheight = 0
-    for (let i = 0; i < daydiv.children.length; i++) {
-        maxheight += daydiv.children[i].offsetHeight
+
+    if (endtime == "") {
+        return alert("You need to enter an end time!!")
     }
-    console.log(maxheight)
+    
+    let endmins = Number(String(endtime).split(":")[0]) * 60 + Number(String(endtime).split(":")[1])
+
+    let startmins = 0
+    for (let i = 1; i < Object.keys(data[id]).length + 1; i++) {
+        if (startmins < data[id][i]["end"]) {
+            startmins = data[id][i]["end"]
+        }
+    }
+
+    if (endmins <= startmins) {
+        return alert("End time must be after start time!!")
+    }
+
+
     eventdiv.className = "event"
-    eventdiv.style.height = daydiv.offsetHeight - maxheight + "px"
 
     let startspan = document.createElement("span")
-    startspan.className = "timespan"
-    
-    let startmins;
-    try {startmins = data[id][Object.keys(data[id]).length]["start"] + (data[id][Object.keys(data[id]).length]["end"] - data[id][Object.keys(data[id]).length]["start"])/2 } catch { startmins = 0}
-
-    
-    let endmins = 1440
-    try {
-        data[id][Object.keys(data[id]).length]["end"] = startmins
-    } catch {}
+    startspan.className = "timespan"    
     
     data[id][Object.keys(data[id]).length + 1] = {
         "start": startmins,
@@ -282,6 +291,7 @@ function addevent(id, name, color) {
         "name": name,
         "color": color
     }
+
     writedata()
 
     loadevents()
@@ -299,7 +309,7 @@ function showpopup(id) {
     popup.style.display = "block"
 
     popup.getElementsByClassName("popupcontent")[0].getElementsByClassName("addeventbtn")[0].onclick = () => {
-        addevent(id, document.getElementById("nameinput").value, document.getElementById("colorinput").value)
+        addevent(id, document.getElementById("nameinput").value, document.getElementById("colorinput").value, document.getElementById("endinput").value)
         hidepopup()
     }
 }
